@@ -3,6 +3,7 @@
 #include "parser.h"
 #include "errors.h"
 #include "BuildSymbol.hpp"
+#include "GenCode.hpp"
 void yyerror(const char *msg); // standard error-handling routine
 %}
 %union {
@@ -150,6 +151,11 @@ Program         :   DeclList    {
         if (ReportError::NumErrors() == 0){
             program->handle(BuildSymbol::B);
         }
+
+        if(ReportError::NumErrors() == 0){
+            program->handle(GenCode::G);
+        }
+
                 }
                 ;
 

@@ -7,7 +7,7 @@
  *
  * You can scan this code to see it works and get a sense of what
  * it does.  You will not need to modify this class unless
- * you're attempting some machine-specific optimizations. 
+ * you're attempting some machine-specific optimizations.
  *
  * It comments the emitted assembly but the commenting for the code
  * in the class itself is pretty sparse. The SPIM manual (see link
@@ -51,16 +51,16 @@ class Mips {
     void SpillForEndFunction();
 
     void EmitCallInstr(Location *dst, const char *fn, bool isL);
-    
+
     static const char *mipsName[BinaryOp::NumOps];
     static const char *NameForTac(BinaryOp::OpCode code);
 
  public:
-    
+
     Mips();
 
     static void Emit(const char *fmt, ...);
-    
+
     void EmitLoadConstant(Location *dst, int val);
     void EmitLoadStringConstant(Location *dst, const char *str);
     void EmitLoadLabel(Location *dst, const char *label);
@@ -68,15 +68,15 @@ class Mips {
     void EmitLoad(Location *dst, Location *reference, int offset);
     void EmitStore(Location *reference, Location *value, int offset);
     void EmitCopy(Location *dst, Location *src);
-    
-    void EmitBinaryOp(BinaryOp::OpCode code, Location *dst, 
+
+    void EmitBinaryOp(BinaryOp::OpCode code, Location *dst,
 			    Location *op1, Location *op2);
 
     void EmitLabel(const char *label);
     void EmitGoto(const char *label);
     void EmitIfZ(Location *test, const char*label);
     void EmitReturn(Location *returnVal);
-    
+
     void EmitBeginFunction(int frameSize);
     void EmitEndFunction();
 
@@ -84,7 +84,7 @@ class Mips {
     void EmitLCall(Location *result, const char* label);
     void EmitACall(Location *result, Location *fnAddr);
     void EmitPopParams(int bytes);
-    
+
     void EmitVTable(const char *label, List<const char*> *methodLabels);
 
     void EmitPreamble();
@@ -92,4 +92,4 @@ class Mips {
 
 
 #endif
- 
+

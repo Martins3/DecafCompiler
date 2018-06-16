@@ -35,7 +35,7 @@ class Operator;
  * on this class are static, thus you can invoke methods directly via
  * the class name, e.g.
  *
- *    if (missingEnd) {
+ *    if (missingEnd) { 
  *       ReportError::UntermString(&yylloc, str);
  *    }
  *
@@ -53,12 +53,12 @@ class ReportError {
  public:
 
   // Errors used by scanner
-  static void UntermComment();
+  static void UntermComment(); 
   static void LongIdentifier(yyltype *loc, const char *ident);
   static void UntermString(yyltype *loc, const char *str);
   static void UnrecogChar(yyltype *loc, char ch);
 
-
+  
   // Errors used by semantic analyzer for declarations
   static void DeclConflict(Decl *newDecl, Decl *prevDecl);
   static void OverrideMismatch(Decl *fnDecl);
@@ -68,15 +68,15 @@ class ReportError {
   // Errors used by semantic analyzer for identifiers
   static void IdentifierNotDeclared(Identifier *ident, reasonT whyNeeded);
 
-
+  
   // Errors used by semantic analyzer for expressions
   static void IncompatibleOperand(Operator *op, Type *rhs); // unary
   static void IncompatibleOperands(Operator *op, Type *lhs, Type *rhs); // binary
   static void ThisOutsideClassScope(This *th);
 
-
+  
  // Errors used by semantic analyzer for array acesss & NewArray
-  static void BracketsOnNonArray(Expr *baseExpr);
+  static void BracketsOnNonArray(Expr *baseExpr); 
   static void SubscriptNotInteger(Expr *subscriptExpr);
   static void NewArraySizeNotInteger(Expr *sizeExpr);
 
@@ -98,16 +98,24 @@ class ReportError {
   static void BreakOutsideLoop(BreakStmt *bStmt);
 
 
+    // Errors used by code-generator/linker
+  static void NoMainFound();
+
   // Generic method to report a printf-style error message
   static void Formatted(yyltype *loc, const char *format, ...);
 
 
   // Returns number of error messages printed
   static int NumErrors() { return numErrors; }
-
+  
  private:
   static void UnderlineErrorInLine(const char *line, yyltype *pos);
   static void OutputError(yyltype *loc, string msg);
   static int numErrors;
 };
+  
+// Wording to use for runtime error messages
+static const char * const err_arr_out_of_bounds = "Decaf runtime error: Array subscript out of bounds\\n";
+static const char * const err_arr_bad_size = "Decaf runtime error: Array size is <= 0\\n";
+ 
 #endif

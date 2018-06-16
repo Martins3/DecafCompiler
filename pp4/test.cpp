@@ -1,6 +1,9 @@
 int a;
 
-class A{}
+class A{
+  int a;
+  int b;
+}
 
 A b;
 int main(){

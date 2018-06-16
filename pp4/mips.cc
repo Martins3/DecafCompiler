@@ -42,7 +42,7 @@ Mips::Register Mips::GetRegister(Location *var, Reason reason,
   Register reg;
 
   if (!FindRegisterWithContents(var, reg)) {
-    if (!FindRegisterWithContents(NULL, reg)) { 
+    if (!FindRegisterWithContents(NULL, reg)) {
 	reg = SelectRegisterToSpill(avoid1, avoid2);
 	SpillRegister(reg);
     }
@@ -73,7 +73,7 @@ Mips::Register Mips::GetRegisterForWrite(Location *var, Register avoid1,
 						     Register avoid2)
 {
   return GetRegister(var, ForWrite, avoid1, avoid2);
-} 
+}
 
 
 // Helper to check if two variable locations are one and the same
@@ -148,7 +148,7 @@ void Mips::SpillRegister(Register reg)
 	   offsetFromWhere,var->GetOffset());
   }
   regs[reg].var = NULL;
-}       
+}
 
 
 /* Method: SpillAllDirtyRegisters
@@ -160,11 +160,11 @@ void Mips::SpillRegister(Register reg)
 void Mips::SpillAllDirtyRegisters()
 {
   Register i;
-  for (i = zero; i < NumRegs; i = Register(i+1)) 
+  for (i = zero; i < NumRegs; i = Register(i+1))
     if (regs[i].var && regs[i].isDirty) break;
   if (i != NumRegs) // none are dirty, don't print message to avoid confusion
     Emit("# (save modified registers before flow of control change)");
-  for (i = zero; i < NumRegs; i = Register(i+1)) 
+  for (i = zero; i < NumRegs; i = Register(i+1))
     SpillRegister(i);
 }
 
@@ -200,7 +200,7 @@ void Mips::Emit(const char *fmt, ...)
 {
   va_list args;
   char buf[1024];
-  
+
   va_start(args, fmt);
   vsprintf(buf, fmt, args);
   va_end(args);
@@ -254,7 +254,7 @@ void Mips::EmitLoadLabel(Location *dst, const char *label)
   Register reg = GetRegisterForWrite(dst);
   Emit("la %s, %s\t# load label", regs[reg].name, label);
 }
- 
+
 
 /* Method: EmitCopy
  * ----------------
@@ -310,7 +310,7 @@ void Mips::EmitStore(Location *reference, Location *value, int offset)
  * emits the appropriate instruction by looking up the mips name
  * for the particular op code.
  */
-void Mips::EmitBinaryOp(BinaryOp::OpCode code, Location *dst, 
+void Mips::EmitBinaryOp(BinaryOp::OpCode code, Location *dst,
 				 Location *op1, Location *op2)
 {
   Register rLeft = GetRegister(op1), rRight = GetRegister(op2, rLeft);
@@ -329,8 +329,8 @@ void Mips::EmitBinaryOp(BinaryOp::OpCode code, Location *dst,
  * wipe the slate clean.
  */
 void Mips::EmitLabel(const char *label)
-{ 
-  SpillAllDirtyRegisters(); 
+{
+  SpillAllDirtyRegisters();
   Emit("%s:", label);
 }
 
@@ -344,7 +344,7 @@ void Mips::EmitLabel(const char *label)
  */
 void Mips::EmitGoto(const char *label)
 {
-  SpillAllDirtyRegisters(); 
+  SpillAllDirtyRegisters();
   Emit("b %s\t\t# unconditional branch", label);
 }
 
@@ -357,7 +357,7 @@ void Mips::EmitGoto(const char *label)
  * all registers here.
  */
 void Mips::EmitIfZ(Location *test, const char *label)
-{ 
+{
   Register testReg = GetRegister(test);
   SpillAllDirtyRegisters();
   Emit("beqz %s, %s\t# branch if %s is zero ", regs[testReg].name, label,
@@ -373,7 +373,7 @@ void Mips::EmitIfZ(Location *test, const char *label)
  * stack.
  */
 void Mips::EmitParam(Location *arg)
-{ 
+{
   Emit("subu $sp, $sp, 4\t# decrement sp to make space for param");
   Register reg = GetRegister(arg);
   Emit("sw %s, 4($sp)\t# copy param value to stack", regs[reg].name);
@@ -389,7 +389,7 @@ void Mips::EmitParam(Location *arg)
  * jal for a label, a jalr if address in register. Both will save the
  * return address in $ra. If there is an expected result passed, we slave
  * the var to a register and copy function return value from $v0 into that
- * register.  
+ * register.
  */
 void Mips::EmitCallInstr(Location *result, const char *fn, bool isLabel)
 {
@@ -404,7 +404,7 @@ void Mips::EmitCallInstr(Location *result, const char *fn, bool isLabel)
 
 // Two covers for the above method for specific LCall/ACall variants
 void Mips::EmitLCall(Location *dst, const char *label)
-{ 
+{
   EmitCallInstr(dst, label, true);
 }
 
@@ -440,8 +440,8 @@ void Mips::EmitPopParams(int bytes)
  * We then emit jr to jump to the saved $ra.
  */
  void Mips::EmitReturn(Location *returnVal)
-{ 
-  if (returnVal != NULL) 
+{
+  if (returnVal != NULL)
     Emit("move $v0, %s\t\t# assign return value into $v0",
 	   regs[GetRegister(returnVal)].name);
   SpillForEndFunction();
@@ -481,7 +481,7 @@ void Mips::EmitBeginFunction(int stackFrameSize)
  * EmitReturn above.
  */
 void Mips::EmitEndFunction()
-{ 
+{
   Emit("# (below handles reaching end of fn body with no explicit return)");
   EmitReturn(NULL);
 }
@@ -523,7 +523,7 @@ void Mips::EmitPreamble()
 /* Method: NameForTac
  * ------------------
  * Returns the appropriate MIPS instruction (add, seq, etc.) for
- * a given BinaryOp:OpCode (BinaryOp::Add, BinaryOp:Equals, etc.). 
+ * a given BinaryOp:OpCode (BinaryOp::Add, BinaryOp:Equals, etc.).
  * Asserts if asked for name of an unset/out of bounds code.
  */
 const char *Mips::NameForTac(BinaryOp::OpCode code)

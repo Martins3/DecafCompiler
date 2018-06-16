@@ -49,7 +49,7 @@ LIBS = -lc -lm -ll
 .yy.o: $*.yy.c
 	$(CC) $(CFLAGS) -c -o $@ $*.cc
 
-lex.yy.c: scanner.l  parser.y y.tab.h 
+lex.yy.c: scanner.l  parser.y y.tab.h
 	$(LEX) $(LEXFLAGS) scanner.l
 
 y.tab.o: y.tab.c

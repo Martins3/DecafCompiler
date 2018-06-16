@@ -95,8 +95,6 @@ class Instruction {
   class VTable;
 
 
-
-
 class LoadConstant: public Instruction {
     Location *dst;
     int val;
