@@ -10,9 +10,12 @@
 #include "./ast_expr.h"
 #include "./ast_type.h"
 #include "./errors.h"
+#include "./utility.h"
+
 #include "./tac.h"
 #include "./codegen.h"
-#include "hashtable.hpp"
+#include "./BuildSymbol.hpp"
+
 #include <iostream>
 #include <cstdio>
 #include <stack>
@@ -106,5 +109,33 @@ public:
     void handleClassDecl(ClassDecl * c);
     void handleInterfaceDecl(InterfaceDecl * i);
     void handleFnDecl(FnDecl * f);
+};
+
+class GetType : public GenCode{
+public:
+    static GetType * T;
+
+    void handleEmptyExpr(EmptyExpr * e);
+
+    void handleIntConstant(IntConstant * i);
+    void handleDoubleConstant(DoubleConstant * d);
+    void handleBoolConstant(BoolConstant * b);
+    void handleStringConstant(StringConstant * s);
+    void handleNullConstant(NullConstant * n);
+
+    void handleArithmeticExpr(ArithmeticExpr * a);
+    void handleRelationalExpr(RelationalExpr * r);
+    void handleEqualityExpr(EqualityExpr * e);
+    void handleLogicalExpr(LogicalExpr * l);
+    void handleAssignExpr(AssignExpr * a);
+    void handleThis(This * t);
+    void handleArrayAccess(ArrayAccess * a);
+    void handleFieldAccess(FieldAccess * f);
+    void handleCall(Call * c);
+
+    void handleNewExpr(NewExpr * n);
+    void handleNewArrayExpr(NewArrayExpr * n);
+    void handleReadIntegerExpr(ReadIntegerExpr * r);
+    void handleReadLineExpr(ReadLineExpr * r);
 };
 #endif

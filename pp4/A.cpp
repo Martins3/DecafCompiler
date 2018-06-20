@@ -16,7 +16,6 @@ int A::s = 12;
 int main(){
 //    REOPEN_READ
 //   REOPEN_WRITE
-//
 
     cout << A::s << endl;
     cout << B::s << endl;

@@ -6,7 +6,7 @@
 #include <string.h>
 #include "ast_type.h"
 #include "ast_decl.h"
- 
+
 /* Class constants
  * ---------------
  * These are public constants for the built-in base types (int, double, etc.)
@@ -21,7 +21,7 @@ Type *Type::voidType   = new Type("void");
 Type *Type::boolType   = new Type("bool");
 Type *Type::nullType   = new Type("null");
 Type *Type::stringType = new Type("string");
-Type *Type::errorType  = new Type("error"); 
+Type *Type::errorType  = new Type("error");
 
 Type::Type(const char *n) {
     Assert(n);
@@ -30,16 +30,15 @@ Type::Type(const char *n) {
 
 
 
-	
+
 NamedType::NamedType(Identifier *i) : Type(*i->GetLocation()) {
     Assert(i != NULL);
     (id=i)->SetParent(this);
-} 
+}
 
 
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
     Assert(et != NULL);
     (elemType=et)->SetParent(this);
 }
-
 

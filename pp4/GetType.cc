@@ -1,45 +1,34 @@
-#include "./GetType.hpp"
-#include <iostream>
+#include "./GenCode.hpp"
 using namespace std;
 
 GetType * GetType::T = new GetType();
-void GetType::handleExpr(Expr * e){
-    printf("I am Expr\n");
-}
 
 void GetType::handleEmptyExpr(EmptyExpr * e){
-    printf("I am EmptyExpr\n");
+    exprType = NULL;
 }
 
 void GetType::handleIntConstant(IntConstant * i){
-    printf("I am IntConstant\n");
+    exprType = Type::intType;
 }
+
 void GetType::handleDoubleConstant(DoubleConstant * d){
-    printf("I am DoubleConstant\n");
+    exprType = Type::doubleType;
 }
 
 void GetType::handleBoolConstant(BoolConstant * b){
-    printf("I am BoolConstant\n");
+    exprType = Type::boolType;
 }
 
 void GetType::handleStringConstant(StringConstant * s){
-    printf("I am StringConstant\n");
+    exprType = Type::stringType;
 }
 
 void GetType::handleNullConstant(NullConstant * n){
-    printf("I am NullConstant\n");
-}
-
-void GetType::handleOperator(Operator * o){
-    printf("I am Operator\n");
-}
-
-void GetType::handleCompoundExpr(CompoundExpr * c){
-    c->right->handle(GetType::G);
+    exprType = Type::nullType;
 }
 
 void GetType::handleArithmeticExpr(ArithmeticExpr * a){
-    a->right->handle(GetType::G);
+    a->right->handle(GetType::T);
 }
 
 void GetType::handleRelationalExpr(RelationalExpr * r){
@@ -56,10 +45,6 @@ void GetType::handleLogicalExpr(LogicalExpr * l){
 
 void GetType::handleAssignExpr(AssignExpr * a){
    a->left->handle(GetType::T);
-}
-
-void GetType::handleLValue(LValue * l){
-    printf("I am LValue\n");
 }
 
 void GetType::handleThis(This * t){
@@ -92,8 +77,18 @@ void GetType::handleCall(Call * c){
     exprType = f->returnType;
 }
 
-void GetType::handleNewExpr(NewExpr * n){ printf("I am NewExpr\n"); }
-void GetType::handleNewArrayExpr(NewArrayExpr * n){ printf("I am NewArrayExpr\n"); }
-void GetType::handleReadIntegerExpr(ReadIntegerExpr * r){ printf("I am ReadIntegerExpr\n"); }
-void GetType::handleReadLineExpr(ReadLineExpr * r){ printf("I am ReadLineExpr\n"); }
+void GetType::handleNewExpr(NewExpr * n){
+    exprType = n->cType; // 参数是NamedType, 所以直接返回
+}
 
+void GetType::handleNewArrayExpr(NewArrayExpr * n){
+    exprType = new ArrayType(*(n->location), n->elemType);
+}
+
+void GetType::handleReadIntegerExpr(ReadIntegerExpr * r){
+    exprType = Type::intType;
+}
+
+void GetType::handleReadLineExpr(ReadLineExpr * r){
+    exprType = Type::stringType;
+}

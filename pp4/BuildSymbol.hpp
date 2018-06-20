@@ -80,6 +80,7 @@ public:
     void handleNode(Node * n);
     void handleIdentifier(Identifier * i);
     void handleError(Error * e);
+
     void handleExpr(Expr * e);
     void handleEmptyExpr(EmptyExpr * e);
     void handleIntConstant(IntConstant * i);

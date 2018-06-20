@@ -1,27 +1,12 @@
 #include <iostream>
 #include "./GenCode.hpp"
-#include "./utility.h"
-#include "./codegen.h"
-#include "./tac.h"
-#include "./BuildSymbol.hpp"
-#include "./GetType.hpp"
-
-
 using namespace std;
-/**
- * 通过名称获取变量 : scope
- * 虽然含有private的限制, FieldAccess的base不是空的时候
- *      1. this
- *      2. 含有自己的指针
- *
- * 通过函数名称获取函数声明， 问题更加大
- *      1. 分析base
- *      2. 找到对应class
- *      3. 查找对应的函数， 但是动态绑定如何实现的
- */
-GenCode * GenCode::G = new GenCode();
-Type * GenCode::exprType = NULL;
 
+
+GenCode * GenCode::G = new GenCode();
+
+// 需要共享的四个变量， 用于检查类型
+Type * GenCode::exprType = NULL;
 deque<Hashtable<VarDecl *> * > * GenCode::nameScope = new deque<Hashtable<VarDecl*> *>(); // 获取局部变量　成员变量　和　全局变量的VarDecl
 Hashtable<Decl *> * GenCode::globalDecl = new Hashtable<Decl *>();
 ClassDecl * GenCode::curClass = NULL; // 方便this的访问
@@ -254,12 +239,20 @@ void GenCode::handleReturnStmt(ReturnStmt * r){
 void GenCode::handlePrintStmt(PrintStmt * p){
     for (int i = 0, n = p->args->NumElements(); i < n; ++i) {
         Expr *e = p->args->Nth(i);
-        // BuiltIn b = e->GetType()->GetPrint();
-        // Assert(b != NumBuiltIns);
+        e->handle(GetType::T);
+        BuiltIn b;
+        if(exprType == Type::boolType){
+            b = PrintBool;
+        }else if(exprType == Type::intType){
+            b = PrintInt;
+        }else if(exprType == Type::stringType){
+            b = PrintString;
+        }else{
+            b = PrintInt; // 其他答应对应的地址
+        }
 
-        // 判断类型，然后计算出来对应的位置
         e->handle(GenCode::G);
-        codeGenerator->GenBuiltInCall(PrintString, returnLoc);
+        codeGenerator->GenBuiltInCall(b, returnLoc);
     }
 }
 
@@ -508,7 +501,7 @@ void GenCode::handleCall(Call * c){
          *  函数，但是两者的便宜相同，所以也是调用同一个函数
          */
         if (!d->isMethod) {
-            ret = codeGenerator->GenLCall(d->label->c_str(), d->returnType == Type::nullType);
+            ret = codeGenerator->GenLCall(d->label->c_str(), d->returnType != Type::nullType);
             codeGenerator->GenPopParams(n * CodeGenerator::VarSize);
         } else {
             Location *b;
@@ -523,16 +516,14 @@ void GenCode::handleCall(Call * c){
             Location *vtable = codeGenerator->GenLoad(b);
             int methodOffset = d->vtblOffset; // 预处理的添加
             Location *faddr = codeGenerator->GenLoad(vtable, methodOffset); // 没有看懂为什么
-            ret = codeGenerator->GenACall(faddr, d->returnType == Type::nullType);
+            ret = codeGenerator->GenACall(faddr, d->returnType != Type::nullType);
             codeGenerator->GenPopParams((n+1) * CodeGenerator::VarSize);
         }
         returnLoc = ret;
     }
-
 }
 
 void GenCode::handleNewExpr(NewExpr * n){
-
     // 获取class类型的声明
     Decl *d = getGlobalDecl(n->cType->id->name);
     Assert(d != NULL);
@@ -637,8 +628,6 @@ void GenCode::handleClassDecl(ClassDecl * c){
     auto nameVar = new Hashtable<VarDecl *>();
     nameScope->push_back(nameVar);
 
-
-    int offset = 0;
     for (int i = 0, n = c->members->NumElements(); i < n; ++i){
         Decl * d = c->members->Nth(i);
         VarDecl * v = dynamic_cast<VarDecl *>(d);
@@ -703,10 +692,3 @@ void GenCode::handleFnDecl(FnDecl * f){
     scope.pop_back();
     nameScope->pop_back();
 }
-
-/**
- *　处理表达式的返回值, 不适用同步处理
- *  应该创建一个新的类来实现
- */
-
-
