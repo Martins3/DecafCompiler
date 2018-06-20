@@ -30,33 +30,33 @@ Operator::Operator(yyltype loc, const char *tok) : Node(loc) {
     Assert(tok != NULL);
     strncpy(tokenString, tok, sizeof(tokenString));
 }
-CompoundExpr::CompoundExpr(Expr *l, Operator *o, Expr *r) 
+CompoundExpr::CompoundExpr(Expr *l, Operator *o, Expr *r)
   : Expr(Join(l->GetLocation(), r->GetLocation())) {
     Assert(l != NULL && o != NULL && r != NULL);
     (op=o)->SetParent(this);
-    (left=l)->SetParent(this); 
+    (left=l)->SetParent(this);
     (right=r)->SetParent(this);
 }
 
-CompoundExpr::CompoundExpr(Operator *o, Expr *r) 
+CompoundExpr::CompoundExpr(Operator *o, Expr *r)
   : Expr(Join(o->GetLocation(), r->GetLocation())) {
     Assert(o != NULL && r != NULL);
-    left = NULL; 
+    left = NULL;
     (op=o)->SetParent(this);
     (right=r)->SetParent(this);
 }
-   
-  
+
+
 ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
-    (base=b)->SetParent(this); 
+    (base=b)->SetParent(this);
     (subscript=s)->SetParent(this);
 }
-     
-FieldAccess::FieldAccess(Expr *b, Identifier *f) 
+
+FieldAccess::FieldAccess(Expr *b, Identifier *f)
   : LValue(b? Join(b->GetLocation(), f->GetLocation()) : *f->GetLocation()) {
     Assert(f != NULL); // b can be be NULL (just means no explicit base)
-    base = b; 
-    if (base) base->SetParent(this); 
+    base = b;
+    if (base) base->SetParent(this);
     (field=f)->SetParent(this);
 }
 
@@ -68,9 +68,9 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     (field=f)->SetParent(this);
     (actuals=a)->SetParentAll(this);
 }
- 
 
-NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) { 
+
+NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) {
   Assert(c != NULL);
   (cType=c)->SetParent(this);
 }
@@ -78,8 +78,8 @@ NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) {
 
 NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
     Assert(sz != NULL && et != NULL);
-    (size=sz)->SetParent(this); 
+    (size=sz)->SetParent(this);
     (elemType=et)->SetParent(this);
 }
 
-       
+

@@ -18,3 +18,11 @@ class.
 ● Otherwise, navigate to the base class and repeat.
 ● This is slow but can be optimized in many cases;
 we'll see this later.
+
+# 指针是做什么
+
+fp frame pointer
+sp 计算的位置总是真正stack 的位置， 但是fp 记录的进入之前sp 的位置
+ra 记录返回的位置
+
+函数参数的处理方法，在进入函数之前开始处理的东西

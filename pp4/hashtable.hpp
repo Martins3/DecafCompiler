@@ -35,6 +35,7 @@
 
 #include <map>
 #include <string.h>
+#include <iostream>
 using namespace std;
 
 struct ltstr {

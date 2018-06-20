@@ -149,10 +149,12 @@ Program         :   DeclList    {
         Program *program = new Program($1);
         // if no errors, advance to next phase
         if (ReportError::NumErrors() == 0){
+            printf("词法通过 ！\n");
             program->handle(BuildSymbol::B);
         }
 
         if(ReportError::NumErrors() == 0){
+            printf("静态检查通过 ！\n");
             program->handle(GenCode::G);
         }
 

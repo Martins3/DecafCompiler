@@ -780,8 +780,6 @@ void BuildSymbol::handleCall(Call * c) {
                 return;
             }
 
-
-
             ClassDecl * cDecl = dynamic_cast<ClassDecl *>(d);
             FnDecl * var;
             if(cDecl != NULL){
@@ -807,6 +805,7 @@ void BuildSymbol::handleCall(Call * c) {
     }
     exprType = Type::errorType;
 }
+
 void BuildSymbol::handleNewExpr(NewExpr * n) {
     // 报错信息过于简单！
     handleNamedTypePara = reasonT::LookingForClass;

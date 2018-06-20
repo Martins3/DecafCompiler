@@ -1,3 +1,2 @@
 make
-# ./dcc < ./samples/t13.decaf
-./dcc < ./test.cpp
+./dcc -d tac < ./test.cpp

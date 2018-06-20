@@ -34,6 +34,7 @@ public:
     }
     Type *type;
 public:
+    int memOffset; //为class 而创建，全局和局部变量不使用
     VarDecl(Identifier *name, Type *type);
 };
 class ClassDecl : public Decl
@@ -46,6 +47,8 @@ public:
     NamedType *extends;
     List<NamedType*> *implements;
 public:
+    int memOffset;
+    int vtblOffset;
     ClassDecl(Identifier *name, NamedType *extends,
               List<NamedType*> *implements, List<Decl*> *members);
 };
@@ -68,7 +71,9 @@ public:
     List<VarDecl*> *formals;
     Type *returnType;
     Stmt *body;
-public:
+    bool isMethod;
+    int vtblOffset;
+    string * label;
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
     void SetFunctionBody(Stmt *b);
 };

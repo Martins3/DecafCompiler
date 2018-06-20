@@ -1,12 +1,14 @@
-int a;
-
 class A{
-  int a;
-  int b;
+    A a;
+    int s;
+    void n(){
+        m().s = 122323;
+    }
+
+    A m(){
+        return a;
+    }
 }
 
-A b;
-int main(){
-    A b;
-    return 1;
+void main(){
 }
