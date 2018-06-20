@@ -15,6 +15,7 @@
 #include "./tac.h"
 #include "./codegen.h"
 #include "./BuildSymbol.hpp"
+#include "./FnLabel.hpp"
 
 #include <iostream>
 #include <cstdio>
@@ -43,6 +44,9 @@ public:
     Location * returnLoc; // 计算出来返回值的结果
     bool storeLValue;
     deque<Hashtable<Location *> * > scope; // 为了获取heap 和 stack 变量的位置的索引
+
+
+
 
 
     Hashtable<int> memOffset; // 进入class 中间之后，访问class 变量返回位置 ???

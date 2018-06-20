@@ -1,7 +1,8 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
 #include "./GenCode.hpp"
 using namespace std;
-
 
 GenCode * GenCode::G = new GenCode();
 
@@ -121,10 +122,12 @@ void GenCode::handleProgram(Program * p){
     }
 
     // 预处理class 和 Interface确定其中的变量和函数的位置
+    // 当前模式难以实现Interface
     for (int i = 0, n = p->decls->NumElements(); i < n; ++i) {
         ClassDecl *d = dynamic_cast<ClassDecl*>(p->decls->Nth(i));
         if(d == NULL) continue;
-        handleClassMember(d);
+        if(d->vtable == NULL)
+            handleClassMember(d);
     }
 
     for (int i = 0, n = p->decls->NumElements(); i < n; ++i){
@@ -575,13 +578,21 @@ void GenCode::handleVarDecl(VarDecl * v){
 void GenCode::handleClassMember(ClassDecl * c){
     c->memOffset = CodeGenerator::OffsetToFirstField;
     c->vtblOffset = CodeGenerator::OffsetToFirstMethod;
+    c->vtable = new Hashtable<FnLabel *>();
 
     // 递归处理继承
     if (c->extends != NULL) {
         ClassDecl *d = dynamic_cast<ClassDecl*>(getGlobalDecl(c->extends->id->name));
         Assert(d != NULL);
+
+        // 查看extends 是否检查过
+        if(d->vtable == NULL)
+            handleClassMember(d);
         c->memOffset += d->memOffset;
         c->vtblOffset += d->vtblOffset;
+
+        // 复制extends的vtabls
+        c->vtable->deepCopy(d->vtable);
     }
 
     // 为变量添加自己的位置，用于之后的分析
@@ -598,26 +609,27 @@ void GenCode::handleClassMember(ClassDecl * c){
         FnDecl *d = dynamic_cast<FnDecl*>(c->members->Nth(i));
         if (d == NULL) continue;
         d->isMethod = true;
-        d->vtblOffset = c->vtblOffset;
-        c->vtblOffset += CodeGenerator::VarSize;
 
+        // 注入标签
         std::string prefix;
         prefix += c->id->name;
         prefix += ".";
         d->label->insert(0, prefix);
+
+        // 查找vtable
+        FnLabel * fnLabel = c->vtable->Lookup(d->id->name);
+        if(fnLabel == NULL){
+            d->vtblOffset = c->vtblOffset;
+
+            c->vtblOffset += CodeGenerator::VarSize;
+            c->vtable->Enter(d->id->name, new FnLabel(d->vtblOffset, d->label->c_str()));
+        }else{
+            // 更新其中label表格, 确定FnDecl的位置
+            d->vtblOffset = fnLabel->offset;
+            FnLabel * nl = new FnLabel(fnLabel->offset, d->label->c_str());
+            c->vtable->Enter(d->id->name, nl);
+        }
     }
-
-    // 添加class标记
-    // 到底是提前添加 还是使用的时候 添加
-    // 为所有VarDecl 和 FnDecl 添加, 不知道为变量添加的意义是什么
-    // XXX : 不是很确定　添加的结果是什么，但是必定非常拉风！
-
-    // for (int i = 0, n = c->members->NumElements(); i < n; ++i) {
-        // std::string prefix;
-        // prefix += c->id->name;
-        // prefix += ".";
-        // c->members->Nth(i)->la
-    // }
 }
 
 void GenCode::handleClassDecl(ClassDecl * c){
@@ -638,13 +650,16 @@ void GenCode::handleClassDecl(ClassDecl * c){
     for (int i = 0, n = c->members->NumElements(); i < n; ++i)
         c->members->Nth(i)->handle(GenCode::G);
 
+    // 从vtable中间
     List<const char*> *labels = new List<const char*>;
-
-    // 获取所有的函数， 防止发生同名函数， 所以label 必须区分
-    // 但是变量是没有使用的必要的
-    for (int i = 0, n = c->members->NumElements(); i < n; ++i) {
-        FnDecl *d = dynamic_cast<FnDecl*>(c->members->Nth(i));
-        if(d != NULL) labels->Append(d->label->c_str());
+    Iterator<FnLabel *> iter = c->vtable->GetIterator();
+    vector<FnLabel *> vec;
+    FnLabel * fl;
+    while((fl = iter.GetNextValue()) != NULL) vec.push_back(fl);
+    CompareFn com;
+    sort(vec.begin(), vec.end(), com);
+    for(FnLabel * f : vec){
+        labels->Append(f->label);
     }
 
     // 创建vtable

@@ -13,6 +13,9 @@
 #define _H_ast_decl
 #include "ast.h"
 #include "list.h"
+#include "hashtable.hpp"
+#include "./FnLabel.hpp"
+
 class Decl : public Node
 {
 public:
@@ -26,6 +29,7 @@ public:
         return out << d->id;
     }
 };
+
 class VarDecl : public Decl
 {
 public:
@@ -37,6 +41,7 @@ public:
     int memOffset; //为class 而创建，全局和局部变量不使用
     VarDecl(Identifier *name, Type *type);
 };
+
 class ClassDecl : public Decl
 {
 public:
@@ -49,6 +54,7 @@ public:
 public:
     int memOffset;
     int vtblOffset;
+    Hashtable<FnLabel *> * vtable;
     ClassDecl(Identifier *name, NamedType *extends,
               List<NamedType*> *implements, List<Decl*> *members);
 };

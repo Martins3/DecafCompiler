@@ -45,6 +45,7 @@ template <class Value> void Hashtable<Value>::Remove(const char *key, Value val)
 
 template <class Value>
 void Hashtable<Value>::deepCopy(Hashtable<Value> * h){
+    // 令人窒息的拷贝
     for(auto i = h->mmap.begin(); i != h->mmap.end(); i ++){
         this->mmap.insert(*i);
     }
